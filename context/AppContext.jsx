@@ -155,7 +155,13 @@ function AppContext({children}) {
   useEffect(() => {
     getString('biometric')
       .then(result => {
-        setIsBiometricsEnabledContext(result);
+        if (result === 'true') {
+          setIsBiometricsEnabledContext(true);
+        } else if (result === 'false') {
+          setIsBiometricsEnabledContext(false);
+        } else {
+          setIsBiometricsEnabledContext(result);
+        }
       })
       .catch(err => console.error('Error fetching biometric setting:', err));
   }, []);

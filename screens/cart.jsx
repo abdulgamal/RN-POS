@@ -5,12 +5,14 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  TextInput,
 } from 'react-native';
 import React from 'react';
 import {useCartContext} from '../context/AppContext';
 import Paper from '../components/Paper';
 
 const Cart = ({navigation}) => {
+  const [clientName, setClientName] = React.useState('');
   const {cartStore} = useCartContext();
   const total = cartStore?.reduce(
     (acc, curr) => acc + curr.sale_price * curr.quantity,
@@ -41,6 +43,14 @@ const Cart = ({navigation}) => {
             />
           </View>
           <View className="py-5">
+            <View className="my-2">
+              <TextInput
+                placeholder="Client name..."
+                className="border p-3 rounded-lg border-gray-400"
+                value={clientName}
+                onChangeText={setClientName}
+              />
+            </View>
             <TouchableOpacity
               className="bg-primary px-3 py-5 rounded-lg justify-center items-center"
               onPress={() => navigation.navigate('Gateway')}

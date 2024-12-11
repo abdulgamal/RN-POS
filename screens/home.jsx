@@ -6,23 +6,43 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from 'react-native';
-import React from 'react';
-import {UserIcon, MagnifyingGlassIcon} from 'react-native-heroicons/outline';
+import React, {useEffect} from 'react';
+import {
+  UserIcon,
+  MagnifyingGlassIcon,
+  RectangleGroupIcon,
+} from 'react-native-heroicons/outline';
 import {useCartContext} from '../context/AppContext';
 import {BASE_URL} from '../services';
-import {height} from '../constants';
+import {height, width} from '../constants';
 import CardItem from '../components/CardItem';
 
 const Home = ({navigation}) => {
   const {items, isPending, isFetching, shouldSync, categories} =
     useCartContext();
+  const [activeCategory, setActiveCategory] = React.useState('0');
+  const [filteredItems, setFilteredItems] = React.useState(items);
 
   const url =
     `${BASE_URL}${items?.[0]?.product?.image}` ||
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq1qC7qPtMAOUR3-ZQsafgfhwmMoyVd5f1hQ&s';
 
-  // console.log('cats', categories);
+  useEffect(() => {
+    const handleFilter = () => {
+      if (activeCategory === '0') {
+        setFilteredItems(items);
+      } else {
+        const filtered = items.filter(
+          item => item.product.category_id === activeCategory,
+        );
+        setFilteredItems(filtered);
+      }
+    };
+    handleFilter();
+  }, [activeCategory]);
+
   return (
     <View className="flex-1 bg-secondary relative">
       <SafeAreaView className="flex-1">
@@ -63,6 +83,53 @@ const Home = ({navigation}) => {
             </View>
           </View>
         )}
+        {categories.length > 0 && (
+          <View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <TouchableOpacity
+                className={`p-3 rounded-xl m-3 justify-center items-center gap-6 ${
+                  activeCategory === '0' ? 'bg-primary' : ''
+                }`}
+                style={{width: width * 0.2}}
+                onPress={() => {
+                  setActiveCategory('0');
+                }}>
+                <RectangleGroupIcon
+                  color={activeCategory === '0' ? 'white' : 'gray'}
+                />
+                <Text
+                  className={`font-semibold text-lg ${
+                    activeCategory === '0' ? 'text-white' : 'text-gray-500'
+                  }`}>
+                  All
+                </Text>
+              </TouchableOpacity>
+              {categories.map(item => (
+                <TouchableOpacity
+                  key={item.id}
+                  className={`p-3 rounded-xl m-3 justify-center items-center gap-6 ${
+                    activeCategory === item.id ? 'bg-primary' : ''
+                  }`}
+                  style={{width: width * 0.2}}
+                  onPress={() => {
+                    setActiveCategory(item.id);
+                  }}>
+                  <RectangleGroupIcon
+                    color={activeCategory === item.id ? 'white' : 'gray'}
+                  />
+                  <Text
+                    className={`font-semibold text-lg ${
+                      activeCategory === item.id
+                        ? 'text-white'
+                        : 'text-gray-500'
+                    }`}>
+                    {item.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
         <View className="flex-1 px-3 pt-2 mt-2">
           {shouldSync ? (
             <View className="flex-1 justify-center items-center">
@@ -85,7 +152,7 @@ const Home = ({navigation}) => {
             </View>
           ) : (
             <FlatList
-              data={items}
+              data={filteredItems}
               renderItem={({item}) => <CardItem item={item} />}
               keyExtractor={item => item.product.id}
               numColumns={2}
