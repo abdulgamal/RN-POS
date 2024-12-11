@@ -7,17 +7,46 @@ import {
   Image,
   TextInput,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useCartContext} from '../context/AppContext';
 import Paper from '../components/Paper';
+import Toast from 'react-native-toast-message';
 
 const Cart = ({navigation}) => {
   const [clientName, setClientName] = React.useState('');
-  const {cartStore} = useCartContext();
+  const {cartStore, customerName, addToWaitlist} = useCartContext();
   const total = cartStore?.reduce(
     (acc, curr) => acc + curr.sale_price * curr.quantity,
     0,
   );
+
+  const handleOrder = () => {
+    if (!clientName) {
+      Toast.show({
+        type: 'error',
+        text2: 'Please enter your client name.',
+      });
+      return;
+    }
+    const item = {
+      clientName: clientName,
+      products: cartStore,
+      totalPrice: total,
+    };
+
+    addToWaitlist(item);
+    navigation.navigate('Wait');
+    setClientName('');
+    Toast.show({
+      type: 'success',
+      text2: 'Items added successfully to waitlist.',
+    });
+  };
+
+  useEffect(() => {
+    setClientName(customerName);
+  }, [customerName]);
+
   return (
     <View className="bg-secondary flex-1">
       <SafeAreaView className="flex-1">
@@ -53,10 +82,10 @@ const Cart = ({navigation}) => {
             </View>
             <TouchableOpacity
               className="bg-primary px-3 py-5 rounded-lg justify-center items-center"
-              onPress={() => navigation.navigate('Gateway')}
+              onPress={handleOrder}
               disabled={cartStore.length == 0}>
               <Text className="text-white font-bold">
-                Check Out | ${total.toFixed(2)}
+                Add to waitlist | ${total.toFixed(2)}
               </Text>
             </TouchableOpacity>
           </View>

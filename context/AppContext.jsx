@@ -127,6 +127,7 @@ function AppContext({children}) {
   const addMoreItems = (newItems, clientName) => {
     setCartStore(newItems);
     setCustomerName(clientName);
+    setWaitlist(prev => prev.filter(w => w.clientName !== clientName));
   };
 
   useEffect(() => {

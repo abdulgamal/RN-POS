@@ -7,6 +7,7 @@ import {
   StatusBar,
 } from 'react-native';
 import {useCartContext} from '../context/AppContext';
+import {HomeIcon} from 'react-native-heroicons/outline';
 
 const Wait = ({navigation}) => {
   const {waitlist, addMoreItems} = useCartContext();
@@ -17,15 +18,21 @@ const Wait = ({navigation}) => {
   };
 
   const handlePayment = obj => {
-    // router.push({
-    //   pathname: './(stack)/gateway',
-    //   params: {clientName: obj?.clientName},
-    // });
+    navigation.navigate('Gateway', {clientName: obj?.clientName});
   };
   return (
     <SafeAreaView className="flex-1 bg-secondary">
       <View className="flex-1 p-4">
-        <Text className="text-primary text-2xl font-bold">Wait List.</Text>
+        <View className="flex-row items-center gap-3">
+          <TouchableOpacity
+            className="w-12 h-12 bg-white justify-center items-center rounded-full"
+            onPress={() => {
+              navigation.navigate('Home');
+            }}>
+            <HomeIcon />
+          </TouchableOpacity>
+          <Text className="text-primary text-2xl font-bold">Wait List.</Text>
+        </View>
         {waitlist.length == 0 && (
           <View className="flex-1 justify-center items-center">
             <Text className="text-2xl text-primary font-bold">

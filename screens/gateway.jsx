@@ -16,18 +16,17 @@ import {makeOrder, sendSTKPush} from '../services';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PayoutCard from '../components/PayoutCard';
+import {HomeIcon} from 'react-native-heroicons/outline';
 
-const Gateway = ({navigation}) => {
+const Gateway = ({navigation, route}) => {
   const [isMpesa, setIsMpesa] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [phone, setPhone] = React.useState('');
   const [merchantId, setMerchantId] = React.useState('');
-  const {cartStore, isConnected, user, removeFromCartStore} = useCartContext();
+  const {isConnected, user, waitlist, removeFromWaitlist} = useCartContext();
+  const {clientName} = route.params;
 
-  const total = cartStore?.reduce(
-    (acc, curr) => acc + curr.sale_price * curr.quantity,
-    0,
-  );
+  const item = waitlist.find(w => w.clientName === clientName);
 
   const mutation = useMutation({
     mutationFn: ({tk, arr}) => makeOrder(tk, arr),
@@ -37,7 +36,7 @@ const Gateway = ({navigation}) => {
         text2: 'Order created successfully',
       });
 
-      removeFromCartStore();
+      removeFromWaitlist(item);
       navigation.navigate('Home');
     },
     onError: error => {
@@ -70,7 +69,7 @@ const Gateway = ({navigation}) => {
     }
     setIsLoading(true);
     try {
-      const response = await sendSTKPush(phone, total);
+      const response = await sendSTKPush(phone, item?.totalPrice);
       if (response?.Description) {
         Toast.show({
           type: 'success',
@@ -91,7 +90,7 @@ const Gateway = ({navigation}) => {
 
   const processOrder = async () => {
     setIsLoading(true);
-    const orderData = {cart_products: cartStore};
+    const orderData = {cart_products: item?.product};
     if (isConnected) {
       mutation.mutate({tk: user?.token, arr: orderData});
     } else {
@@ -100,7 +99,7 @@ const Gateway = ({navigation}) => {
         type: 'success',
         text2: 'Order saved locally. Will sync when online',
       });
-      removeFromCartStore();
+      removeFromWaitlist(item);
       navigation.navigate('Home');
     }
     setIsLoading(false);
@@ -137,7 +136,7 @@ const Gateway = ({navigation}) => {
           });
           setMerchantId('');
           let obj = {
-            cart_products: cartStore,
+            cart_products: item?.product,
           };
           mutation.mutate({tk: user?.token, arr: obj});
         }
@@ -189,10 +188,19 @@ const Gateway = ({navigation}) => {
     <View className="flex-1 bg-secondary">
       <SafeAreaView className="flex-1">
         <View className="flex-1 px-3 mt-4">
-          <Text className="font-bold text-2xl text-gray-600">Payout</Text>
+          <View className="flex-row items-center gap-3">
+            <TouchableOpacity
+              className="w-12 h-12 bg-white justify-center items-center rounded-full"
+              onPress={() => {
+                navigation.navigate('Home');
+              }}>
+              <HomeIcon />
+            </TouchableOpacity>
+            <Text className="text-primary text-2xl font-bold">Payout</Text>
+          </View>
           <View className="flex-1 mt-2 py-3">
             <FlatList
-              data={cartStore}
+              data={item?.products}
               renderItem={({item}) => <PayoutCard item={item} />}
               showsVerticalScrollIndicator={false}
             />
@@ -223,7 +231,7 @@ const Gateway = ({navigation}) => {
             <View className="flex-row items-center justify-between my-1">
               <Text className="font-semibold text-gray-600">Item total</Text>
               <Text className="font-bold text-lg text-gray-500">
-                ${total.toFixed(2)}
+                ${item?.totalPrice.toFixed(2)}
               </Text>
             </View>
             <View className="flex-row items-center justify-between my-1">
@@ -237,7 +245,7 @@ const Gateway = ({navigation}) => {
             <View className="my-3 flex-row items-center justify-between py-2 border-t border-gray-300">
               <Text className="font-bold text-gray-600">Total</Text>
               <Text className="font-bold text-lg text-gray-500">
-                ${total.toFixed(2)}
+                ${item?.totalPrice.toFixed(2)}
               </Text>
             </View>
             <TouchableOpacity

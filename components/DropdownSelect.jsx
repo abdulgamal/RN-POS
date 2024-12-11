@@ -9,13 +9,15 @@ import {HomeIcon} from 'react-native-heroicons/outline';
 import Toast from 'react-native-toast-message';
 
 const DropDownSelect = () => {
-  const {user, refetch, isConnected, setShouldRefetch} = useCartContext();
+  const {user, refetch, isConnected, setShouldRefetch, removeFromCartStore} =
+    useCartContext();
   const items = user?.workspaces;
   const [value, setValue] = useState(null);
 
   const mutation = useMutation({
     mutationFn: ({id, tk}) => setActiveWorkspace(tk, id),
     onSuccess: () => {
+      removeFromCartStore();
       refetch();
       setShouldRefetch(true);
       Toast.show({

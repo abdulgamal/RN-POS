@@ -13,6 +13,7 @@ import {
   UserIcon,
   MagnifyingGlassIcon,
   RectangleGroupIcon,
+  QueueListIcon,
 } from 'react-native-heroicons/outline';
 import {useCartContext} from '../context/AppContext';
 import {BASE_URL} from '../services';
@@ -20,7 +21,7 @@ import {height, width} from '../constants';
 import CardItem from '../components/CardItem';
 
 const Home = ({navigation}) => {
-  const {items, isPending, isFetching, shouldSync, categories} =
+  const {items, isPending, isFetching, shouldSync, categories, waitlist} =
     useCartContext();
   const [activeCategory, setActiveCategory] = React.useState('0');
   const [filteredItems, setFilteredItems] = React.useState(items);
@@ -41,7 +42,7 @@ const Home = ({navigation}) => {
       }
     };
     handleFilter();
-  }, [activeCategory]);
+  }, [activeCategory, items]);
 
   return (
     <View className="flex-1 bg-secondary relative">
@@ -54,13 +55,24 @@ const Home = ({navigation}) => {
             }}>
             <UserIcon />
           </TouchableOpacity>
-          <TouchableOpacity
-            className="w-12 h-12 bg-white justify-center items-center rounded-full"
-            onPress={() => {
-              navigation.navigate('Search');
-            }}>
-            <MagnifyingGlassIcon />
-          </TouchableOpacity>
+          <View className="flex-row items-center gap-3">
+            {waitlist?.length > 0 && (
+              <TouchableOpacity
+                className="w-12 h-12 bg-white justify-center items-center rounded-full"
+                onPress={() => {
+                  navigation.navigate('Wait');
+                }}>
+                <QueueListIcon />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              className="w-12 h-12 bg-white justify-center items-center rounded-full"
+              onPress={() => {
+                navigation.navigate('Search');
+              }}>
+              <MagnifyingGlassIcon />
+            </TouchableOpacity>
+          </View>
         </View>
         {items?.length > 0 && (
           <View
@@ -83,7 +95,7 @@ const Home = ({navigation}) => {
             </View>
           </View>
         )}
-        {categories.length > 0 && (
+        {categories?.length > 0 && (
           <View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <TouchableOpacity
@@ -104,7 +116,7 @@ const Home = ({navigation}) => {
                   All
                 </Text>
               </TouchableOpacity>
-              {categories.map(item => (
+              {categories?.map(item => (
                 <TouchableOpacity
                   key={item.id}
                   className={`p-3 rounded-xl m-3 justify-center items-center gap-6 ${
