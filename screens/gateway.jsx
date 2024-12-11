@@ -7,7 +7,6 @@ import {
   TextInput,
   Switch,
   FlatList,
-  StatusBar,
 } from 'react-native';
 import React, {useEffect} from 'react';
 import EventSource from 'react-native-sse';

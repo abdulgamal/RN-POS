@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Image,
-  StatusBar,
 } from 'react-native';
 import React from 'react';
 import {UserIcon, MagnifyingGlassIcon} from 'react-native-heroicons/outline';
@@ -16,19 +15,23 @@ import {height} from '../constants';
 import CardItem from '../components/CardItem';
 
 const Home = ({navigation}) => {
-  const {items, isPending, isFetching, shouldSync} = useCartContext();
+  const {items, isPending, isFetching, shouldSync, categories} =
+    useCartContext();
 
   const url =
     `${BASE_URL}${items?.[0]?.product?.image}` ||
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq1qC7qPtMAOUR3-ZQsafgfhwmMoyVd5f1hQ&s';
 
+  // console.log('cats', categories);
   return (
     <View className="flex-1 bg-secondary relative">
       <SafeAreaView className="flex-1">
         <View className="flex-row items-center justify-between mt-5 px-3">
           <TouchableOpacity
             className="w-12 h-12 bg-white justify-center items-center rounded-full"
-            onPress={() => {}}>
+            onPress={() => {
+              navigation.navigate('Profile');
+            }}>
             <UserIcon />
           </TouchableOpacity>
           <TouchableOpacity
@@ -69,7 +72,9 @@ const Home = ({navigation}) => {
                 </Text>
                 <TouchableOpacity
                   className="bg-secondary px-4 py-3 rounded-full w-24 justify-center items-center mt-2"
-                  onPress={() => {}}>
+                  onPress={() => {
+                    navigation.navigate('Profile');
+                  }}>
                   <Text className="font-bold">Sync</Text>
                 </TouchableOpacity>
               </View>
@@ -92,11 +97,11 @@ const Home = ({navigation}) => {
                   <Text className="text-primary font-semibold text-xl">
                     No Items in this workspace
                   </Text>
-                  {/* <Image
-                    source={require('../../assets/images/cart.png')}
+                  <Image
+                    source={require('../assets/images/cart.png')}
                     resizeMode="cover"
                     className="w-40 h-40 mt-3"
-                  /> */}
+                  />
                 </View>
               )}
             />

@@ -9,6 +9,7 @@ import BottomCart from './components/BottomCart';
 import Search from './screens/search';
 import Cart from './screens/cart';
 import Gateway from './screens/gateway';
+import Profile from './screens/profile';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ function RootStack() {
       <Stack.Group>
         <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="Gateway" component={Gateway} />
+        <Stack.Screen name="Profile" component={Profile} />
       </Stack.Group>
     </Stack.Navigator>
   );

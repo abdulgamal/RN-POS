@@ -3,7 +3,7 @@ import {useQuery} from '@tanstack/react-query';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getString} from '../utils';
-import {fetchAllItems} from '../services';
+import {fetchAllItems, fetchCategories} from '../services';
 
 const ContextApp = createContext(null);
 
@@ -24,6 +24,20 @@ function AppContext({children}) {
     queryFn: async () => {
       try {
         const response = await fetchAllItems(user?.token);
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching items:', error);
+        return [];
+      }
+    },
+    enabled: !!user,
+  });
+
+  const {data: categories} = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      try {
+        const response = await fetchCategories(user?.token);
         return response.data;
       } catch (error) {
         console.error('Error fetching items:', error);
@@ -177,6 +191,7 @@ function AppContext({children}) {
       shouldSync,
       setShouldSync,
       removeFromCartStore,
+      categories,
     }),
     [
       cartStore,

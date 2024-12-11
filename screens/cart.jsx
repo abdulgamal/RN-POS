@@ -31,11 +31,11 @@ const Cart = ({navigation}) => {
                   <Text className="text-primary font-semibold text-xl">
                     No Items in the cart
                   </Text>
-                  {/* <Image
-                    source={require('../../assets/images/cart.png')}
+                  <Image
+                    source={require('../assets/images/cart.png')}
                     resizeMode="cover"
                     className="w-40 h-40 mt-3"
-                  /> */}
+                  />
                 </View>
               )}
             />

@@ -24,6 +24,15 @@ export const fetchAllItems = async token => {
   return response.data;
 };
 
+export const fetchCategories = async token => {
+  const response = await axios.get(`${BASE_URL}api/Pos/product-categories`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
 export const setActiveWorkspace = async (token, workspaceId) => {
   const response = await axios.get(
     `${BASE_URL}api/Pos/set-active-workspace/${workspaceId}`,
